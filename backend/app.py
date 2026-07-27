@@ -44,7 +44,22 @@ def predict_sales():
 
     # Return the prediction as a JSON response
     return jsonify({'Sales': prediction})
-
+# Batch prediction endpoint
+@superkart_api.post('/v1/batch_predict')
+def predict_batch_sales():
+    data = request.get_json()
+    input_data = pd.DataFrame(data)
+    
+    # Maintain exact column order expected by model
+    feature_order = [
+        'Product_Weight', 'Product_Sugar_Content', 'Product_Allocated_Area',
+        'Product_MRP', 'Store_Size', 'Store_Location_City_Type',
+        'Store_Type', 'Product_Id_char', 'Store_Age_Years', 'Product_Type_Category'
+    ]
+    input_data = input_data[feature_order]
+    
+    predictions = model.predict(input_data).tolist()
+    return jsonify({'Sales_Predictions': predictions})
 
 # Run the Flask app in debug mode
 if __name__ == '__main__':
